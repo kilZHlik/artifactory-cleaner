@@ -1,0 +1,78 @@
+#!/bin/bash
+
+__info()
+{
+	echo -e 'Artifactory cleaner v.0.1\nCurrent launch mode:'
+	[ -z "`echo $EMULATION_MODE | grep -Ex '(false|False|FALSE|0)'`" ] && echo 'EMULATION_MODE=true' || echo 'EMULATION_MODE=false'
+	[ -z "`echo $VERBOSE_MODE | grep -Ex '(true|True|TRUE|1)'`" ] && echo 'VERBOSE_MODE=false' || echo 'VERBOSE_MODE=true'
+}
+
+__help()
+{
+	__info
+	echo -e '\nThe following launch arguments are available:
+-c — Specify the path of an alternative configuration file.
++e — Enable emulation mode.
+-e — Disable emulation mode.
+-i — Show application information and startup options.
++v — Enable verbose mode.
+-v — Disable verbose mode.'
+	exit 0
+}
+
+__test_arguments()
+{
+	if [ "$1" == "+${TEST_ARGUMENTS_ARRAY[$INC]: +1}" ]
+	then
+		[ -z "`for INT in ${TEST_ARGUMENTS_ARRAY[@]}; do printf "%s\n" $INT; done | grep -x "\-${TEST_ARGUMENTS_ARRAY[$INC]: +1}"`" ] && true || false
+	elif [ "$1" == "-${TEST_ARGUMENTS_ARRAY[$INC]: +1}" ]
+	then
+		[ -z "`for INT in ${TEST_ARGUMENTS_ARRAY[@]}; do printf "%s\n" $INT; done | grep -x "\+${TEST_ARGUMENTS_ARRAY[$INC]: +1}"`" ] && true || false
+	fi
+}
+
+__mess_of_test_arguments()
+{
+	(( INC++ ))
+	TEST_ARGUMENTS_ARRAY[$INC]=$1
+	if ! __test_arguments $1
+	then
+		echo "Error: conflict of arguments: +${TEST_ARGUMENTS_ARRAY[$INC]: +1} and -${TEST_ARGUMENTS_ARRAY[$INC]: +1}"
+		exit 1
+	fi
+}
+
+unset CONFIG_FILE
+
+INCR=0
+ARGUMENTS_ARRAY=("$@")
+for INT in "${ARGUMENTS_ARRAY[@]}"
+do
+	case "$INT"
+	in
+		'+e'		) unset EMULATION_MODE;;
+		'+v'		) export VERBOSE_MODE='true' ;;
+		'-e'		) export EMULATION_MODE='false';;
+		'-v'		) unset VERBOSE_MODE;;
+		'-c'		) CONFIG_FILE=${ARGUMENTS_ARRAY[$((INCR+1))]} EXCLUDE_TEST_INDEX=$((INCR+1));;
+		'-i'		) __info; exit 0;;
+		'--info'	) __info; exit 0;;
+		'--version'	) __info; exit 0;;
+		'-h'		) __help;;
+		'--help'	) __help;;
+		*			) [ "$EXCLUDE_TEST_INDEX" != "$INCR" ] && { echo 'Incorrect startup arguments!'; __help; };;
+	esac
+	(( INCR++ ))
+	__mess_of_test_arguments $INT
+done
+unset INC INCR TEST_ARGUMENTS_ARRAY[@]
+
+if [ -n "$CONFIG_FILE" ] && [ ! -f "$CONFIG_FILE" ]
+then
+	echo "Error: No config found."
+	exit 1
+else
+	CONFIG_FILE=`readlink -f "$CONFIG_FILE"`
+fi
+
+/opt/artifactory-cleaner/processor.sh

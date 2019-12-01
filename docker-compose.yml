@@ -1,0 +1,14 @@
+version: '2'
+services:
+  task:
+    image: kilzhlik/artifactory-cleaner
+    container_name: artifactory-cleaner
+    user: root
+    restart: unless-stopped
+    volumes:
+      - "$PWD/artifactory-cleaner.yml:/opt/artifactory-cleaner/artifactory-cleaner.yml"
+    environment:
+      JF_USER: "USER"
+      JF_USER_TOKEN: "USER_TOKEN"
+      EMULATION_MODE: "true"
+      VERBOSE_MODE: "false"

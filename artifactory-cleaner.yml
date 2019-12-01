@@ -1,0 +1,18 @@
+jfrog_artifactory_address: "https://artifactory.local"
+timeout_rescan: "1"
+repositories:
+  - repo: "my-repo"
+    name: "qa-build"
+    name_ignore: ""
+    size: [ ">1mb", "<20mb" ]
+    age: [ ">30", "<900" ]
+    rm_non_empty_dirs: "false"
+    recursive: "true"
+
+  - repo: "docker-local/product"
+    name: [ "dev-buil", "034-5" ]
+    name_ignore: ""
+    size: "<211kb"
+    age: "=30"
+    recursive:
+      coefficient: "2"
