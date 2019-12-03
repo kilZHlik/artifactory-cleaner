@@ -116,7 +116,9 @@ It is also possible to use the commands constituted for manual launch (but witho
 However, in large organizations where the Jfrog Artifactory service is usual shared, it is recommended to use the scheduler built into the "Artifactory-cleaner" controlled by the `timeout_rescan` parameter. (see the description of the `timeout_rescan` parameter in Section 2.3).
 
 An example of running a manual scan command inside an already running container with the `--help` attribute:
-`docker exec -it <container name> artifactory-cleaner --help`
+```
+docker exec -it <container name> artifactory-cleaner --help
+```
 
 You can do the same by creating a new container:
 ```
@@ -167,7 +169,9 @@ This example connects two configuration files to the artifactory-cleaner contain
 
 
 After that, accessing an alternative configuration file in the attribute of the `artifactory-cleaner` command for an already running container looks like this:
-`docker exec -it <container name> artifactory-cleaner -e -c /opt/artifactory-cleaner/artifactory-cleaner_test.yml`
+```
+docker exec -it <container name> artifactory-cleaner -e -c /opt/artifactory-cleaner/artifactory-cleaner_test.yml
+```
 
 
 To run from an image, this command looks logically a little different:
