@@ -13,6 +13,7 @@ Authorization data is reported by Artifactory-cleaner by passing variables to th
 The presence of variables required for authorization is a prerequisite for starting Artifactory-cleaner:
 
 `JF_USER:` < user Jfrog Artifactory >
+
 `JF_USER_TOKEN:` < user Token  >
 
 
@@ -179,7 +180,9 @@ In it, the config is not redefined in the launch attribute of the artifactory-cl
 
 Artifactory-cleaner logs all actions that may cause user questions in stdout, this makes it possible to understand what is happening by reading the container logs with the Docker tools.
 The command to view the live container log:
-`docker logs -f <container name>`
+```
+docker logs -f <container name>
+```
 
 
 * * *
