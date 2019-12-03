@@ -170,7 +170,8 @@ This example connects two configuration files to the artifactory-cleaner contain
 
 After that, accessing an alternative configuration file in the attribute of the `artifactory-cleaner` command for an already running container looks like this:
 ```
-docker exec -it <container name> artifactory-cleaner -e -c /opt/artifactory-cleaner/artifactory-cleaner_test.yml
+docker exec -it <container name> artifactory-cleaner -e \
+-c /opt/artifactory-cleaner/artifactory-cleaner_test.yml
 ```
 
 
