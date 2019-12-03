@@ -158,7 +158,6 @@ __parsing_json_data () { echo "$1" | jq $2 | sed 's/"//g;  s/,$//' | grep -vx nu
 	{
 		__log_mess 'Error retrieving data from an artifact! Retrying after 3 min...'
 		sleep 3m
-		continue
 	}
 	
 	INCREM=1
@@ -170,11 +169,15 @@ __parsing_json_data () { echo "$1" | jq $2 | sed 's/"//g;  s/,$//' | grep -vx nu
 
 		while [ -n "${ARTIFACT_children_url[$INCR]}" ]
 		do
-			JF_REPOSITORY_PATH=${ARTIFACT_children_url[$INCR]}
+			export JF_REPOSITORY_PATH=${ARTIFACT_children_url[$INCR]}
 			[ "${JF_REPOSITORY_PATH: -1}" == '/' ] && export JF_REPOSITORY_PATH=${JF_REPOSITORY_PATH::-1}
 			[ "${JF_REPOSITORY_PATH:0:1}" == '/' ] && export JF_REPOSITORY_PATH=${JF_REPOSITORY_PATH: +1}
 
-			ARTIFACTS_LIST="`python "$RUN_DIR/artifacts_list.py"`" || __connection_error
+			if ! ARTIFACTS_LIST="`python "$RUN_DIR/artifacts_list.py" 2> /dev/null`"
+			then
+				__connection_error
+				continue
+			fi
 
 			while read ARTIFACT
 			do
@@ -183,6 +186,7 @@ __parsing_json_data () { echo "$1" | jq $2 | sed 's/"//g;  s/,$//' | grep -vx nu
 					until ARTIFACT_DATA="$(curl --connect-timeout 90 --max-time 90 -s -H "Authorization: Bearer $JF_USER_TOKEN" -X GET `echo $ARTIFACT 2> /dev/null | sed "s|^$JF_ADDRESS|$JF_ADDRESS/api/storage|g"`)"
 					do
 						__connection_error
+						continue
 					done
 					[ -n "`echo $VERBOSE_MODE | grep -Ex '(true|True|TRUE|1)'`" ] && __log_mess "Scan element:\n$ARTIFACT_DATA\n\n"
 				fi
