@@ -177,7 +177,7 @@ __parsing_json_data () { echo "$1" | jq $2 | sed 's/"//g;  s/,$//' | grep -vx nu
 			do
 				if [ -n "$ARTIFACT" ]
 				then
-					until ARTIFACT_DATA="$(curl --connect-timeout 90 --max-time 90 -s -H "Authorization: Bearer $JF_USER_TOKEN" -X GET $JF_ADDRESS$JF_PORT/api/storage`echo $ARTIFACT 2> /dev/null | sed -E "s#^$JF_ADDRESS(:[0-9]{1,7}|)##g"`)"
+					until ARTIFACT_DATA="$(curl --connect-timeout 90 --max-time 90 -s -H "Authorization: Bearer $JF_USER_TOKEN" -X GET $JF_ADDRESS$JF_PORT/api/storage`echo $ARTIFACT 2> /dev/null | sed -E "s#$JF_ADDRESS(:[0-9]{1,7}|)##"`)"
 					do
 						__connection_error
 						continue
