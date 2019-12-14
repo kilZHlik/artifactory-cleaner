@@ -1,5 +1,5 @@
 #!/bin/bash
-# required: jq yq curl bc
+# required: jq yq curl bc rev
 
 RUN_DIR=`readlink -f "$(dirname "$0")"`
 __log_mess () { echo -e `date +%F\ %T` - "$@"; }
@@ -270,9 +270,10 @@ __parsing_json_data () { echo "$1" | jq $2 | sed 's/"//g;  s/,$//' | grep -vx nu
 			[ -n "${SEARCH_SIZE_EQUAL_ARREY[$INCR]}" ] && { (( "${ARTIFACT_size[$INC]}" == "${SEARCH_SIZE_EQUAL_ARREY[$INCR]}" )) || continue; }
 		fi
 
-		[ -n "${SEARCH_AGE_MORE_ARREY[$INCR]}" ] && { (( "$(( ($(date '+%s') - $(date '+%s' -d "${ARTIFACT_lastModified[$INC]}")) / 86400 ))" > "${SEARCH_AGE_MORE_ARREY[$INCR]}" )) || continue; }
-		[ -n "${SEARCH_AGE_LESS_ARREY[$INCR]}" ] && { (( "$(( ($(date '+%s') - $(date '+%s' -d "${ARTIFACT_lastModified[$INC]}")) / 86400 ))" < "${SEARCH_AGE_LESS_ARREY[$INCR]}" )) || continue; }
-		[ -n "${SEARCH_AGE_EQUAL_ARREY[$INCR]}" ] && { (( "$(( ($(date '+%s') - $(date '+%s' -d "${ARTIFACT_lastModified[$INC]}")) / 86400 ))" == "${SEARCH_AGE_EQUAL_ARREY[$INCR]}" )) || continue; }
+		SEARCH_AGE=$(( ($(date '+%s') - $(date '+%s' -d "${ARTIFACT_lastModified[$INC]}")) / 86400 ))
+		[ -n "${SEARCH_AGE_MORE_ARREY[$INCR]}" ] && { (( "$SEARCH_AGE" > "${SEARCH_AGE_MORE_ARREY[$INCR]}" )) || continue; }
+		[ -n "${SEARCH_AGE_LESS_ARREY[$INCR]}" ] && { (( "$SEARCH_AGE" < "${SEARCH_AGE_LESS_ARREY[$INCR]}" )) || continue; }
+		[ -n "${SEARCH_AGE_EQUAL_ARREY[$INCR]}" ] && { (( "$SEARCH_AGE" == "${SEARCH_AGE_EQUAL_ARREY[$INCR]}" )) || continue; }
 		[ -n "${SEARCH_NAME_ARREY[$INCR]}" ] && { [ -n "`echo "$ARTIFACT_PATH_IN_REPOSITORY" | grep -E "${SEARCH_NAME_ARREY[$INCR]}"`" ] || continue; }
 		[ -n "${SEARCH_NAME_IGNORE_ARREY[$INCR]}" ] && { [ -n "`echo "$ARTIFACT_PATH_IN_REPOSITORY" | grep -E "${SEARCH_NAME_IGNORE_ARREY[$INCR]}"`" ] && continue; }
 
@@ -280,7 +281,7 @@ __parsing_json_data () { echo "$1" | jq $2 | sed 's/"//g;  s/,$//' | grep -vx nu
 		ARTIFACT_size_IS_DELETED[$INCREM]=${ARTIFACT_size[$INC]}
 		export ARTIFACT_TO_REMOVE=`echo $ARTIFACT_API_LINK | sed 's|/api/storage||'`
 		[ -n "`echo $EMULATION_MODE | grep -Ex '(false|False|FALSE|0)'`" ] && python "$RUN_DIR/rm_artifact.py"
-		__log_mess "Deleting the artifact: $ARTIFACT_TO_REMOVE (Size: $(__value_size_reducing ${ARTIFACT_size[$INC]}), Created: $(date '+%d %B %Y' -d ${ARTIFACT_lastModified[$INC]}))"
+		__log_mess "Deleting the artifact: $ARTIFACT_TO_REMOVE (Size: $(__value_size_reducing ${ARTIFACT_size[$INC]}), Created: $(date '+%d %B %Y' -d ${ARTIFACT_lastModified[$INC]}) — $SEARCH_AGE days ago)"
 	done
 
 	for INT in ${ARTIFACT_size_IS_DELETED[@]}

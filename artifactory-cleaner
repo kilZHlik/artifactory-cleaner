@@ -2,7 +2,7 @@
 
 __info()
 {
-	echo -e 'Artifactory cleaner v.0.1\nCurrent launch mode:'
+	echo -e 'Artifactory cleaner v.0.2\nCurrent launch mode:'
 	[ -z "`echo $EMULATION_MODE | grep -Ex '(false|False|FALSE|0)'`" ] && echo 'EMULATION_MODE=true' || echo 'EMULATION_MODE=false'
 	[ -z "`echo $VERBOSE_MODE | grep -Ex '(true|True|TRUE|1)'`" ] && echo 'VERBOSE_MODE=false' || echo 'VERBOSE_MODE=true'
 }
