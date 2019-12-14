@@ -1,6 +1,6 @@
 # Manual of Artifactory-cleaner v.0.2
 
-With regret, I notice that the Docker hub does not correctly display the markdown, therefore it is better to read the instructions on the [Github](https://github.com/kilZHlik/artifactory-cleaner).
+With regret, I notice that the Docker hub does not correctly display the markdown, therefore it is better to read this instructions on the [Github](https://github.com/kilZHlik/artifactory-cleaner).
 
 Artifactory-cleaner is a software for automatically cleaning Jfrog Artifactory from irrelevant artifacts. Artifactory-cleaner interprets working with the API of any Jfrog Artifactory repositories as an interaction with a model of hierarchical file system. This model of interaction with the API and the implementation of flexible search parameters make Artifactory-cleaner a universal tool for cleaning irrelevant artifacts of any type. Artifactory-cleaner uses the dohq-artifactory Python library to interact with Jfrog Artifactory: https://github.com/devopshq/artifactory .
 
