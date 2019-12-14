@@ -1,7 +1,5 @@
 # Manual of Artifactory-cleaner v.0.2
 
-<sup>With regret, I notice that the Docker hub does not correctly display the markdown, therefore it is better to read this instructions on the [Github](https://github.com/kilZHlik/artifactory-cleaner).<sup>
-
 Artifactory-cleaner is a software for automatically cleaning Jfrog Artifactory from irrelevant artifacts. Artifactory-cleaner interprets working with the API of any Jfrog Artifactory repositories as an interaction with a model of hierarchical file system. This model of interaction with the API and the implementation of flexible search parameters make Artifactory-cleaner a universal tool for cleaning irrelevant artifacts of any type. Artifactory-cleaner uses the dohq-artifactory Python library to interact with Jfrog Artifactory: https://github.com/devopshq/artifactory .
 
 Keep in mind that Artifactory-cleaner is the result of the author’s free creative enthusiasm, and not some official Jfrog Artifactory tool. All possible responsibility for the consequences of any damage from the use of this software lies only with its users. You are free to use or not use this software. Your freedom is your responsibility! :)
@@ -85,17 +83,17 @@ The number of sections with repositories in the list repositoriescan be indicate
 * `rm_non_empty_dirs:` < true/false > (default: `false`) - delete directories with artifacts (optional parameter).
 **Caution: use this option with caution!**
 When adding a parameter `rm_non_empty_dirs` with a value `true`, in order for the directory to be deleted, the search parameter must also be specified `name`(see description of the parameter `name`). This condition is a specially introduced restriction aimed at reducing the risk of mistakenly deleting non-empty directories.
-*Note: when deleting various artifacts, for example, when deleting Docker images, empty directories may be formed. All empty directories that Artifactory-cleaner detects according to the search parameters will be automatically deleted during subsequent scanning, regardless of the parameter value `rm_non_empty_dirs`.*
-*Note: for directories, the `size` parameter is ignored.*
+<span style="white-space: nowrap; font-style:italic; font-size:0.9em;">Note: when deleting various artifacts, for example, when deleting Docker images, empty directories may be formed. All empty directories that Artifactory-cleaner detects according to the search parameters will be automatically deleted during subsequent scanning, regardless of the parameter value `rm_non_empty_dirs`.</span>
+<span style="white-space: nowrap; font-style:italic; font-size:0.9em;">Note: for directories, the `size` parameter is ignored.</span>
 
 * `recursive:` < true/false > (default: `false`) - scan subdirectories (optional parameter).
 For the parameter `recursive`, a sub-parameter ` coefficient` with a numerical value can be defined (see 2.1. Example configuration file). The `coefficient` subparameter sets the maximum nesting of directories in which the search will be performed from the initial directory defined in the` repo` parameter.
 
 * `age:` is the age of the artifact in days (optional parameter). Format: `<(>, <, =)> <number>`. Only integers are supported. The value can be one or several with different conditions. Several conditions are be combined into a list (see 2.1. Example configuration file). The conditions `(>, <, =)` in the list must be unique. No more than one list per parameter is supported. 
-*Note: for a correct search using the “age” parameter, the correct time must be indicated on the Jfrog Artifactory server and on the machine on which the container with Artifactory-cleaner is running.*
+<span style="margin-top:0.5em; white-space: nowrap; font-style:italic; font-size:0.9em;">Note: for a correct search using the “age” parameter, the correct time must be indicated on the Jfrog Artifactory server and on the machine on which the container with Artifactory-cleaner is running.</span>
 
 * `name:` - matching name (optional parameter). Part of the name on the way to the artifact from the repository directory, including the name of the artifact itself. The value of this parameter is case sensitive. As a value, a list of names can be specified in the sequence in which they are expected to be present in the path from the repository directory to the name of the artifact itself. Supported not more than one list per parameter . Also in the field `name` it is allowed to use regexps.
-<span style="font-style:italic; font-size:3em;"> Note: When building regexps and using backslashes, do not forget that in yaml format the ackslash must be escaped by the second backslash.</span>
+<span style="white-space: nowrap; font-style:italic; font-size:0.9em;">Note: When building regexps and using backslashes, do not forget that in yaml format the ackslash must be escaped by the second backslash.</span>
 Please note that the final artifact (by analogy with the file system: the final search file) can be written in the API of Jfrog Artifactory view to an object whose name is stored as a hash of the sum. That is, it can be stored in a file whose name may have nothing to do with the name of the artifact expected for a person - for example, with the name of a Docker image or archive file. For this reason, the search for the name of the artifact is carried out all the way to it from the repository directory set in the `repo` parameter. This, on the one hand, is not quite the traditional behavior for the usual search tools, but it also allows you to more flexibly configure filtering by name. On the other hand, this behavior is a technical limitation in favor of universality and support for all types of repositories. If you are confused by information about hash sums, then do not pay attention to it, just keep in mind that the artifact will be searched not only by its name but also all the way from the beginning of the specified repository directory.
 
 
