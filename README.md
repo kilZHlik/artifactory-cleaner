@@ -81,7 +81,7 @@ The number of sections with repositories in the list repositoriescan be indicate
 * `repo:` < path > - repository (required parameter). Using the Jfrog Artifactory API, Artifactory-cleaner presents the repository as directory properties. This allows you to specify as a repository the path with subdirectories in the repository (see 2.1. Example configuration file). This provides additional flexibility in determining the search terms.
 
 * `rm_non_empty_dirs:` < true/false > (default: `false`) - delete directories with artifacts (optional parameter).
-**Caution: use this option with caution!**
+######Caution: use this option with caution!
 When adding a parameter `rm_non_empty_dirs` with a value `true`, in order for the directory to be deleted, the search parameter must also be specified `name`(see description of the parameter `name`). This condition is a specially introduced restriction aimed at reducing the risk of mistakenly deleting non-empty directories.
 
   *Note: when deleting various artifacts, for example, when deleting Docker images, empty directories may be formed. All empty directories that Artifactory-cleaner detects according to the search parameters will be automatically deleted during subsequent scanning, regardless of the parameter value `rm_non_empty_dirs`*
@@ -117,6 +117,7 @@ The parameters `name`,` size` and `age` are properties of the artifact, which to
 As mentioned above, manually starting Artifactory-cleaner in emulation mode with an alternative config is a true way approach for selecting and testing a search config before entering parameters from it into the default configuration file used in the container.
 
 It is also possible to use the commands constituted for manual launch (but without the `-t` attribute) to run the search for artifacts at a specific time by adding them to tasks for cron on the Docker host or adding them to your CI/CD pipeline.
+
 *More information on working with cron can be found here: https://www.cyberciti.biz/faq/how-do-i-add-jobs-to-cron-under-linux-or-unix-oses*
 
 However, in large organizations where the Jfrog Artifactory service is usual shared, it is recommended to use the scheduler built into the "Artifactory-cleaner" controlled by the `timeout_rescan` parameter. (see the description of the `timeout_rescan` parameter in Section 2.3).
