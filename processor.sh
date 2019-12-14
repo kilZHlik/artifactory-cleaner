@@ -61,7 +61,6 @@ __parsing_json_data () { echo "$1" | jq $2 | sed 's/"//g;  s/,$//' | grep -vx nu
 		then
 			__log_mess "Missing expected repository name. Incorrect part of the config:\n$REPOSITORY_OPTIONS"
 			exit 1
-
 		elif [ "`echo "${SEARCH_NAME_ARREY[$INC]}" | sed 's| ||'`" != "${SEARCH_NAME_ARREY[$INC]}" ] || [ "`echo "${SEARCH_NAME_IGNORE_ARREY[$INC]}" | sed 's| ||'`" != "${SEARCH_NAME_IGNORE_ARREY[$INC]}" ]
 		then
 			__log_mess "Missing expected search name. Incorrect part of the config:\n$REPOSITORY_OPTIONS"
