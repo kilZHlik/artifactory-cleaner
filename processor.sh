@@ -47,9 +47,9 @@ __parsing_json_data () { echo "$1" | jq $2 | sed 's/"//g;  s/,$//' | grep -vx nu
 		SEARCH_RECURSIVE_COEFFICIENT_ARREY[$INC]=`__parsing_json_data "$REPOSITORY_OPTIONS" .recursive.coefficient 2> /dev/null`
 		SEARCH_NAME_IGNORE_ARREY[$INC]=`__parsing_json_data "$REPOSITORY_OPTIONS" .name_ignore`
 		SEARCH_RM_NON_EMPTY_DIRS_ARREY[$INC]=`__parsing_json_data "$REPOSITORY_OPTIONS" .rm_non_empty_dirs`
-		SEARCH_AGE_MORE_ARREY[$INC]=`__parsing_json_data "$REPOSITORY_OPTIONS" .age | grep -Ex '>[0-9]{1,256}' | sed 's/^>//' | tail -n 1`
-		SEARCH_AGE_LESS_ARREY[$INC]=`__parsing_json_data "$REPOSITORY_OPTIONS" .age | grep -Ex '<[0-9]{1,256}' | sed 's/^<//' | tail -n 1`
-		SEARCH_AGE_EQUAL_ARREY[$INC]=`__parsing_json_data "$REPOSITORY_OPTIONS" .age | grep -Ex '=[0-9]{1,256}' | sed 's/^=//' | tail -n 1`
+		SEARCH_AGE_MORE_ARREY[$INC]=`__parsing_json_data "$REPOSITORY_OPTIONS" .age | sed -n 's/ *//gp' | grep -Ex '>[0-9]{1,256}' | sed 's/^>//' | tail -n 1`
+		SEARCH_AGE_LESS_ARREY[$INC]=`__parsing_json_data "$REPOSITORY_OPTIONS" .age | sed -n 's/ *//gp' | grep -Ex '<[0-9]{1,256}' | sed 's/^<//' | tail -n 1`
+		SEARCH_AGE_EQUAL_ARREY[$INC]=`__parsing_json_data "$REPOSITORY_OPTIONS" .age | sed -n 's/ *//gp' | grep -Ex '=[0-9]{1,256}' | sed 's/^=//' | tail -n 1`
 		SEARCH_SIZE_MORE_ARREY[$INC]=`__parsing_json_data "$REPOSITORY_OPTIONS" .size  | sed -n 's/ *//gp' \
 		| grep -Ex '>[0-9]{1,256}(gb|Gb|GB|mb|Mb|MB|kb|Kb|KB|)' | sed -E 's/^>//; s/(kb|Kb|KB)/000/g; s/(mb|Mb|MB)/000000/g; s/(gb|Gb|GB)/000000000/g' | tail -n 1`
 		SEARCH_SIZE_LESS_ARREY[$INC]=`__parsing_json_data "$REPOSITORY_OPTIONS" .size  | sed -n 's/ *//gp' \
