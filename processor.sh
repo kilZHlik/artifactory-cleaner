@@ -33,7 +33,7 @@ __parsing_json_data () { echo "$1" | jq $2 | sed 's/"//g;  s/,$//' | grep -vx nu
 	[ -z "$JF_ADDRESS" ] && __mess_of_invalid_config 'Artifactory address not specified'
 	[ "${JF_ADDRESS: -1}" == '/' ] && JF_ADDRESS=${JF_ADDRESS::-1}
 	JF_PORT=`echo $JF_ADDRESS | rev | sed 's/:/: /' | rev | awk '{print $2}' | grep -Ex ':[0-9]{1,5}'`
-	$JF_ADDRESS=`echo $JF_ADDRESS | sed -E 's/:[0-9]{1,5}$//'`
+	JF_ADDRESS=`echo $JF_ADDRESS | sed -E 's/:[0-9]{1,5}$//'`
 
 	__get_config_parametrs()
 	{
@@ -74,13 +74,13 @@ __parsing_json_data () { echo "$1" | jq $2 | sed 's/"//g;  s/,$//' | grep -vx nu
 
 		for INT in SEARCH_NAME_ARREY SEARCH_NAME_IGNORE_ARREY
 		do
-			if (( "`eval echo \"\${$INT[$INC]}\" | wc -l`" > "1" ))
+			if (( "$(eval echo \"\${$INT[$INC]}\" | wc -l)" > "1" ))
 			then
 				while read SEARCH_NAME
 				do
 					COMPOUND_SEARCH_NAME=$COMPOUND_SEARCH_NAME$NAMES_DELIMITER$SEARCH_NAME
 					NAMES_DELIMITER='(.*)'
-				done <<< "`eval echo \"\${$INT[$INC]}\" | tail -n +2 | head -n -1`"
+				done <<< "$(eval echo \"\${$INT[$INC]}\" | tail -n +2 | head -n -1)"
 				eval $INT[$INC]=$COMPOUND_SEARCH_NAME
 				unset NAMES_DELIMITER COMPOUND_SEARCH_NAME
 			fi
