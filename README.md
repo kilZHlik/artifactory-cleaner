@@ -112,7 +112,7 @@ The parameters `name`,` size` and `age` are properties of the artifact, which to
 
 As mentioned above, manually starting Artifactory-cleaner in emulation mode with an alternative config is a true way approach for selecting and testing a search config before entering parameters from it into the default configuration file used in the container.
 
-It is also possible to use the commands constituted for manual launch (but without the `-t` attribute) to run the search for artifacts at a specific time by adding them to tasks for cron on the Docker host.
+It is also possible to use the commands constituted for manual launch (but without the `-t` attribute) to run the search for artifacts at a specific time by adding them to tasks for cron on the Docker host or adding them to your CI/CD pipeline.
 *More information on working with cron can be found here: https://www.cyberciti.biz/faq/how-do-i-add-jobs-to-cron-under-linux-or-unix-oses*
 
 However, in large organizations where the Jfrog Artifactory service is usual shared, it is recommended to use the scheduler built into the "Artifactory-cleaner" controlled by the `timeout_rescan` parameter. (see the description of the `timeout_rescan` parameter in Section 2.3).
