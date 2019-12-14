@@ -278,7 +278,8 @@ __parsing_json_data () { echo "$1" | jq $2 | sed 's/"//g;  s/,$//' | grep -vx nu
 
 		(( INCREM++ ))
 		ARTIFACT_size_IS_DELETED[$INCREM]=${ARTIFACT_size[$INC]}
-		export ARTIFACT_TO_REMOVE=`echo $ARTIFACT_API_LINK | sed 's|/api/storage||'`
+		export ARTIFACT_TO_REMOVE=`echo $ARTIFACT_API_LINK | sed -E "s#(:[0-9]{1,7}|)/api/storage#$JF_PORT#"`
+
 		[ -n "`echo $EMULATION_MODE | grep -Ex '(false|False|FALSE|0)'`" ] && python "$RUN_DIR/rm_artifact.py"
 		__log_mess "Deleting the artifact: $ARTIFACT_TO_REMOVE (Size: $(__value_size_reducing ${ARTIFACT_size[$INC]}), Created: $(date '+%d %B %Y' -d ${ARTIFACT_lastModified[$INC]}) — $SEARCH_AGE days ago)"
 	done
