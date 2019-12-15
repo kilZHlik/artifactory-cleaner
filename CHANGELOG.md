@@ -1,6 +1,6 @@
 # Change Log
 
-## [0.3] (https://github.com/kilZHlik/artifactory-cleaner/tree/0.3) (2019-12-17)
+## [0.3](https://github.com/kilZHlik/artifactory-cleaner/tree/0.3) (2019-12-17)
 
 **Implemented enhancements:**
 
@@ -10,7 +10,7 @@
 
 - Added Change Log.
 
-## [0.2] (https://github.com/kilZHlik/artifactory-cleaner/tree/0.2) (2019-12-05)
+## [0.2](https://github.com/kilZHlik/artifactory-cleaner/tree/0.2) (2019-12-05)
 
 **Implemented enhancements:**
 
@@ -28,6 +28,6 @@
 
 - Partial refactoring.
 
-## [0.1] (https://github.com/kilZHlik/artifactory-cleaner/tree/0.1) (2019-12-01)
+## [0.1](https://github.com/kilZHlik/artifactory-cleaner/tree/0.1) (2019-12-01)
 
 - First release.
