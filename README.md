@@ -195,8 +195,8 @@ The command to view the live container log:
 docker logs -f <container name>
 ```
 
-#### [Change Log] (https://github.com/kilZHlik/artifactory-cleaner/blob/0.3/CHANGELOG.md)
+#### [Change Log](https://github.com/kilZHlik/artifactory-cleaner/blob/0.3/CHANGELOG.md)
 
 * * *
 
-[Github repository of the Artifactory-cleaner] (https://github.com/kilZHlik/artifactory-cleaner)
+[Github repository of the Artifactory-cleaner](https://github.com/kilZHlik/artifactory-cleaner)
