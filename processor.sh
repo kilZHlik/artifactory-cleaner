@@ -5,6 +5,8 @@ RUN_DIR=`readlink -f "$(dirname "$0")"`
 __log_mess () { echo -e `date +%F\ %T` - "$@"; }
 __parsing_json_data () { echo "$1" | jq $2 | sed 's/"//g;  s/,$//' | grep -vx null; }
 
+
+
 #Parsing config:
 	__mess_of_invalid_config()
 	{
@@ -125,8 +127,33 @@ __parsing_json_data () { echo "$1" | jq $2 | sed 's/"//g;  s/,$//' | grep -vx nu
 
 
 #Parsing artifact data:
-	__log_mess 'Start scanning artifacts...'
 	START_TIME=`date +%s`
+	__log_mess 'Start scanning artifacts...'
+	
+	__connection_for_get_artifact_data() { curl --connect-timeout 90 --max-time 90 -s "$@" -X GET $JF_ADDRESS$JF_PORT/api/storage`echo $ARTIFACT 2> /dev/null | sed -E "s#$JF_ADDRESS(:[0-9]{1,7}|)##"`; }
+	__first_metod_of_getting_artifact_data () { ARTIFACT_DATA=$(__connection_for_get_artifact_data -H "Authorization: Bearer $JF_USER_TOKEN") && [ -n "`__parsing_json_data "$ARTIFACT_DATA" .uri 2> /dev/null`" ]; }
+	__second_metod_of_getting_artifact_data () { ARTIFACT_DATA=$(__connection_for_get_artifact_data -u $JF_USER:$JF_USER_TOKEN) && [ -n "`__parsing_json_data "$ARTIFACT_DATA" .uri 2> /dev/null`" ]; }
+
+	__get_artifact_data()
+	{
+		if [ -z "$FIRST_AUTHORIZATION_METOD" ] && [ -z "$SECOND_AUTHORIZATION_METOD" ]
+		then
+			if __first_metod_of_getting_artifact_data
+			then
+				FIRST_AUTHORIZATION_METOD=true
+			elif __second_metod_of_getting_artifact_data
+			then
+				SECOND_AUTHORIZATION_METOD=true
+			else
+				false
+			fi
+		elif [ -n "$FIRST_AUTHORIZATION_METOD" ]
+		then
+			__first_metod_of_getting_artifact_data
+		elif [ -n "$SECOND_AUTHORIZATION_METOD" ]
+			__second_metod_of_getting_artifact_data
+		fi
+	}
 
 	__get_artifact_parametrs()
 	{
@@ -176,7 +203,7 @@ __parsing_json_data () { echo "$1" | jq $2 | sed 's/"//g;  s/,$//' | grep -vx nu
 			do
 				if [ -n "$ARTIFACT" ]
 				then
-					until ARTIFACT_DATA="$(curl --connect-timeout 90 --max-time 90 -s -H "Authorization: Bearer $JF_USER_TOKEN" -X GET $JF_ADDRESS$JF_PORT/api/storage`echo $ARTIFACT 2> /dev/null | sed -E "s#$JF_ADDRESS(:[0-9]{1,7}|)##"`)"
+					until __get_artifact_data
 					do
 						__connection_error
 						continue
@@ -236,7 +263,6 @@ __parsing_json_data () { echo "$1" | jq $2 | sed 's/"//g;  s/,$//' | grep -vx nu
 
 
 #Applying conditions for the deletion of artifacts:
-
 	__value_size_reducing()
 	{
 		if (( "$1" > '1000000000000' ))
