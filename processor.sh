@@ -3,7 +3,7 @@
 
 RUN_DIR=`readlink -f "$(dirname "$0")"`
 __log_mess () { echo -e `date +%F\ %T` - "$@"; }
-__parsing_json_data () { echo "$1" | jq $2 | sed 's/"//g;  s/,$//' | grep -vx null; }
+__parsing_json_data () { echo "$1" | { jq $2 2> /dev/null || echo __ERROR_FORMAT_JSON__; } | grep -vx null | sed 's/"//g;  s/,$//' | sed -n 's/ *//gp'; }
 
 
 
@@ -26,9 +26,9 @@ __parsing_json_data () { echo "$1" | jq $2 | sed 's/"//g;  s/,$//' | grep -vx nu
 	}
 
 	__get_config_content
-	__parsing_config () { echo "$__CONFIG_CONTENT" | yq $1 | sed 's/"//g' | grep -vx null; }
+	__parsing_config () { echo "$__CONFIG_CONTENT" | yq $1 2> /dev/null | sed 's/"//g' | grep -vx null; }
 
-	JF_TIMEOUT_RESCAN=`__parsing_config .timeout_rescan 2> /dev/null`
+	JF_TIMEOUT_RESCAN=`__parsing_config .timeout_rescan`
 	[ -z "`echo "$JF_TIMEOUT_RESCAN" | grep -Ex '[0-9]{1,256}'`" -a -n "$JF_TIMEOUT_RESCAN" ] && __mess_of_invalid_config 'Rescan timeout is invalid.'
 
 	JF_ADDRESS=`__parsing_config .jfrog_artifactory_address`
@@ -46,32 +46,27 @@ __parsing_json_data () { echo "$1" | jq $2 | sed 's/"//g;  s/,$//' | grep -vx nu
 		REPOSITORY_ARREY[$INC]=`__parsing_json_data "$REPOSITORY_OPTIONS" .repo`
 		SEARCH_NAME_ARREY[$INC]=`__parsing_json_data "$REPOSITORY_OPTIONS" .name`
 		SEARCH_RECURSIVE_ARREY[$INC]=`__parsing_json_data "$REPOSITORY_OPTIONS" .recursive`
-		SEARCH_RECURSIVE_COEFFICIENT_ARREY[$INC]=`__parsing_json_data "$REPOSITORY_OPTIONS" .recursive.coefficient 2> /dev/null`
+		SEARCH_RECURSIVE_COEFFICIENT_ARREY[$INC]=`__parsing_json_data "$REPOSITORY_OPTIONS" .recursive.coefficient | grep -vx __ERROR_FORMAT_JSON__`
 		SEARCH_NAME_IGNORE_ARREY[$INC]=`__parsing_json_data "$REPOSITORY_OPTIONS" .name_ignore`
 		SEARCH_RM_NON_EMPTY_DIRS_ARREY[$INC]=`__parsing_json_data "$REPOSITORY_OPTIONS" .rm_non_empty_dirs`
-		SEARCH_AGE_MORE_ARREY[$INC]=`__parsing_json_data "$REPOSITORY_OPTIONS" .age | sed -n 's/ *//gp' | grep -Ex '>[0-9]{1,256}' | sed 's/^>//' | tail -n 1`
-		SEARCH_AGE_LESS_ARREY[$INC]=`__parsing_json_data "$REPOSITORY_OPTIONS" .age | sed -n 's/ *//gp' | grep -Ex '<[0-9]{1,256}' | sed 's/^<//' | tail -n 1`
-		SEARCH_AGE_EQUAL_ARREY[$INC]=`__parsing_json_data "$REPOSITORY_OPTIONS" .age | sed -n 's/ *//gp' | grep -Ex '=[0-9]{1,256}' | sed 's/^=//' | tail -n 1`
-		SEARCH_SIZE_MORE_ARREY[$INC]=`__parsing_json_data "$REPOSITORY_OPTIONS" .size  | sed -n 's/ *//gp' \
-		| grep -Ex '>[0-9]{1,256}(gb|Gb|GB|mb|Mb|MB|kb|Kb|KB|)' | sed -E 's/^>//; s/(kb|Kb|KB)/000/g; s/(mb|Mb|MB)/000000/g; s/(gb|Gb|GB)/000000000/g' | tail -n 1`
-		SEARCH_SIZE_LESS_ARREY[$INC]=`__parsing_json_data "$REPOSITORY_OPTIONS" .size  | sed -n 's/ *//gp' \
-		| grep -Ex '<[0-9]{1,256}(gb|Gb|GB|mb|Mb|MB|kb|Kb|KB|)' | sed -E 's/^<//; s/(kb|Kb|KB)/000/g; s/(mb|Mb|MB)/000000/g; s/(gb|Gb|GB)/000000000/g' | tail -n 1`
-		SEARCH_SIZE_EQUAL_ARREY[$INC]=`__parsing_json_data "$REPOSITORY_OPTIONS" .size  | sed -n 's/ *//gp' \
-		| grep -Ex '=[0-9]{1,256}(gb|Gb|GB|mb|Mb|MB|kb|Kb|KB|)' | sed -E 's/^=//; s/(kb|Kb|KB)/000/g; s/(mb|Mb|MB)/000000/g; s/(gb|Gb|GB)/000000000/g' | tail -n 1`
+		SEARCH_AGE_MORE_ARREY[$INC]=`__parsing_json_data "$REPOSITORY_OPTIONS" .age | grep -Ex '>[0-9]{1,256}' | sed 's/^>//' | tail -n 1`
+		SEARCH_AGE_LESS_ARREY[$INC]=`__parsing_json_data "$REPOSITORY_OPTIONS" .age | grep -Ex '<[0-9]{1,256}' | sed 's/^<//' | tail -n 1`
+		SEARCH_AGE_EQUAL_ARREY[$INC]=`__parsing_json_data "$REPOSITORY_OPTIONS" .age | grep -Ex '=[0-9]{1,256}' | sed 's/^=//' | tail -n 1`
+		SEARCH_SIZE_MORE_ARREY[$INC]=`__parsing_json_data "$REPOSITORY_OPTIONS" .size  | grep -Ex '>[0-9]{1,256}(gb|Gb|GB|mb|Mb|MB|kb|Kb|KB|)' \
+		| sed -E 's/^>//; s/(kb|Kb|KB)/000/g; s/(mb|Mb|MB)/000000/g; s/(gb|Gb|GB)/000000000/g' | tail -n 1`
+		SEARCH_SIZE_LESS_ARREY[$INC]=`__parsing_json_data "$REPOSITORY_OPTIONS" .size  | grep -Ex '<[0-9]{1,256}(gb|Gb|GB|mb|Mb|MB|kb|Kb|KB|)' \
+		| sed -E 's/^<//; s/(kb|Kb|KB)/000/g; s/(mb|Mb|MB)/000000/g; s/(gb|Gb|GB)/000000000/g' | tail -n 1`
+		SEARCH_SIZE_EQUAL_ARREY[$INC]=`__parsing_json_data "$REPOSITORY_OPTIONS" .size | grep -Ex '=[0-9]{1,256}(gb|Gb|GB|mb|Mb|MB|kb|Kb|KB|)' \
+		| sed -E 's/^=//; s/(kb|Kb|KB)/000/g; s/(mb|Mb|MB)/000000/g; s/(gb|Gb|GB)/000000000/g' | tail -n 1`
 
-		if [ -z "`echo ${REPOSITORY_ARREY[$INC]}`" ] || [ "`echo "${REPOSITORY_ARREY[$INC]}" | sed 's| ||'`" != "${REPOSITORY_ARREY[$INC]}" ]
-		then
-			__log_mess "Missing expected repository name. Incorrect part of the config:\n$REPOSITORY_OPTIONS"
-			exit 1
-		elif [ "`echo "${SEARCH_NAME_ARREY[$INC]}" | sed 's| ||'`" != "${SEARCH_NAME_ARREY[$INC]}" ] || [ "`echo "${SEARCH_NAME_IGNORE_ARREY[$INC]}" | sed 's| ||'`" != "${SEARCH_NAME_IGNORE_ARREY[$INC]}" ]
-		then
-			__log_mess "Missing expected search name. Incorrect part of the config:\n$REPOSITORY_OPTIONS"
-			exit 1
-		fi
-
-		[ -z "${SEARCH_AGE_MORE_ARREY[$INC]}" ] && [ -z "${SEARCH_AGE_LESS_ARREY[$INC]}" ] && [ -z "${SEARCH_AGE_EQUAL_ARREY[$INC]}" ] && \
-		[ -z "${SEARCH_SIZE_MORE_ARREY[$INC]}" ] && [ -z "${SEARCH_SIZE_LESS_ARREY[$INC]}" ] && [ -z "${SEARCH_SIZE_EQUAL_ARREY[$INC]}" ] && \
-		[ -z "${SEARCH_NAME_ARREY[$INC]}" ] && __mess_of_invalid_config "For the \"$CHECK_REPO\" repository, at least one sample attribute must be specified" && exit 1
+		for INT in REPOSITORY_ARREY SEARCH_NAME_ARREY SEARCH_RECURSIVE_ARREY SEARCH_NAME_IGNORE_ARREY SEARCH_RM_NON_EMPTY_DIRS_ARREY
+		do
+			if [ "$(eval echo \${$INT[$INC]})" == '__ERROR_FORMAT_JSON__' ]
+			then
+				__log_mess "Missing expected search name. Incorrect value \"$INT\" in the part of the config:\n$REPOSITORY_OPTIONS"
+				exit 1
+			fi
+		done
 
 		for INT in SEARCH_NAME_ARREY SEARCH_NAME_IGNORE_ARREY
 		do
@@ -82,10 +77,14 @@ __parsing_json_data () { echo "$1" | jq $2 | sed 's/"//g;  s/,$//' | grep -vx nu
 					COMPOUND_SEARCH_NAME=$COMPOUND_SEARCH_NAME$NAMES_DELIMITER$SEARCH_NAME
 					NAMES_DELIMITER='(.*)'
 				done <<< "$(eval echo \"\${$INT[$INC]}\" | tail -n +2 | head -n -1)"
-				eval $INT[$INC]=$COMPOUND_SEARCH_NAME
+				eval $INT[$INC]=\"$COMPOUND_SEARCH_NAME\"
 				unset NAMES_DELIMITER COMPOUND_SEARCH_NAME
 			fi
 		done
+		
+		[ -z "${SEARCH_AGE_MORE_ARREY[$INC]}" ] && [ -z "${SEARCH_AGE_LESS_ARREY[$INC]}" ] && [ -z "${SEARCH_AGE_EQUAL_ARREY[$INC]}" ] && \
+		[ -z "${SEARCH_SIZE_MORE_ARREY[$INC]}" ] && [ -z "${SEARCH_SIZE_LESS_ARREY[$INC]}" ] && [ -z "${SEARCH_SIZE_EQUAL_ARREY[$INC]}" ] && \
+		[ -z "${SEARCH_NAME_ARREY[$INC]}" ] && __mess_of_invalid_config "For the \"${REPOSITORY_ARREY[$INC]}\" repository, at least one sample attribute must be specified" && exit 1
 	}
 
 	while read STRING_REPOSITORY_OPTIONS
@@ -130,9 +129,9 @@ __parsing_json_data () { echo "$1" | jq $2 | sed 's/"//g;  s/,$//' | grep -vx nu
 	START_TIME=`date +%s`
 	__log_mess 'Start scanning artifacts...'
 	
-	__connection_for_get_artifact_data() { curl --connect-timeout 90 --max-time 90 -s "$@" -X GET $JF_ADDRESS$JF_PORT/api/storage`echo $ARTIFACT 2> /dev/null | sed -E "s#$JF_ADDRESS(:[0-9]{1,7}|)##"`; }
-	__first_metod_of_getting_artifact_data () { ARTIFACT_DATA=$(__connection_for_get_artifact_data -H "Authorization: Bearer $JF_USER_TOKEN") && [ -n "`__parsing_json_data "$ARTIFACT_DATA" .uri 2> /dev/null`" ]; }
-	__second_metod_of_getting_artifact_data () { ARTIFACT_DATA=$(__connection_for_get_artifact_data -u $JF_USER:$JF_USER_TOKEN) && [ -n "`__parsing_json_data "$ARTIFACT_DATA" .uri 2> /dev/null`" ]; }
+	__connection_for_get_artifact_data() { curl --connect-timeout 90 --max-time 90 -s "$@" -X GET $JF_ADDRESS$JF_PORT/api/storage`echo $ARTIFACT | sed -E "s#$JF_ADDRESS(:[0-9]{1,7}|)##"`; }
+	__first_metod_of_getting_artifact_data () { ARTIFACT_DATA=$(__connection_for_get_artifact_data -H "Authorization: Bearer $JF_USER_TOKEN") && [ -n "`__parsing_json_data "$ARTIFACT_DATA" .uri | grep -vx __ERROR_FORMAT_JSON__`" ]; }
+	__second_metod_of_getting_artifact_data () { ARTIFACT_DATA=$(__connection_for_get_artifact_data -u $JF_USER:$JF_USER_TOKEN) && [ -n "`__parsing_json_data "$ARTIFACT_DATA" .uri | grep -vx __ERROR_FORMAT_JSON__`" ]; }
 
 	__get_artifact_data()
 	{
