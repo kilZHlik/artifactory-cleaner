@@ -58,7 +58,7 @@ do
 		JF_TIMEOUT_RESCAN=$(( "$JF_TIMEOUT_RESCAN" * "1440" ))
 		GENERATED_TIMEOUT=`shuf -i 1-$JF_TIMEOUT_RESCAN -n 1`
 		TIMEOUT_OF_THE_REMAINING_WAIT_ACCORDING_TO_THE_SPECIFIED_FREQUENCY=$(( "$JF_TIMEOUT_RESCAN" - "$GENERATED_TIMEOUT" ))
-		__log_mess "Next scan time for Artifactory repositories: $(date -d "+$GENERATED_TIMEOUT min" '+%d %B %Y %T')"
+		__log_mess "Next scan time for Artifactory repositories: $(date -d "+$GENERATED_TIMEOUT min" '+%d %B %Y in %Hh:%Mmin')"
 		sleep ${GENERATED_TIMEOUT}m
 	#---
 done
