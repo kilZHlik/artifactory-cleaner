@@ -166,6 +166,7 @@ services:
     volumes:
       - "$PWD/artifactory-cleaner.yml:/opt/artifactory-cleaner/artifactory-cleaner.yml"
       - "$PWD/artifactory-cleaner_test.yml:/opt/artifactory-cleaner/artifactory-cleaner_test.yml"
+      - "/etc/localtime:/etc/localtime:ro"
     environment:
       JF_USER: "USER"
       JF_USER_TOKEN: "USER_TOKEN"
