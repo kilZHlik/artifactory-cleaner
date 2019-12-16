@@ -151,6 +151,7 @@ __parsing_json_data () { echo "$1" | jq $2 | sed 's/"//g;  s/,$//' | grep -vx nu
 		then
 			__first_metod_of_getting_artifact_data
 		elif [ -n "$SECOND_AUTHORIZATION_METOD" ]
+		then
 			__second_metod_of_getting_artifact_data
 		fi
 	}
