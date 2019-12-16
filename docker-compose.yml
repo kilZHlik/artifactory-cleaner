@@ -7,6 +7,7 @@ services:
     restart: unless-stopped
     volumes:
       - "$PWD/artifactory-cleaner.yml:/opt/artifactory-cleaner/artifactory-cleaner.yml"
+      - "/etc/localtime:/etc/localtime:ro"
     environment:
       JF_USER: "USER"
       JF_USER_TOKEN: "USER_TOKEN"
