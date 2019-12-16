@@ -29,7 +29,7 @@ __parsing_json_data () { echo "$1" | { jq $2 2> /dev/null || echo __ERROR_FORMAT
 	__parsing_config () { echo "$__CONFIG_CONTENT" | yq $1 2> /dev/null | sed 's/"//g' | grep -vx null; }
 
 	JF_TIMEOUT_RESCAN=`__parsing_config .timeout_rescan`
-	[ -z "`echo "$JF_TIMEOUT_RESCAN" | grep -Ex '[0-9]{1,256}'`" -a -n "$JF_TIMEOUT_RESCAN" ] && __mess_of_invalid_config 'Rescan timeout is invalid.'
+	[ -z "`echo "$JF_TIMEOUT_RESCAN" | grep -Ex '[0-9]{1,128}'`" -a -n "$JF_TIMEOUT_RESCAN" ] && __mess_of_invalid_config 'Rescan timeout is invalid.'
 
 	JF_ADDRESS=`__parsing_config .jfrog_artifactory_address`
 	[ -z "$JF_ADDRESS" ] && __mess_of_invalid_config 'Artifactory address not specified'
@@ -49,14 +49,14 @@ __parsing_json_data () { echo "$1" | { jq $2 2> /dev/null || echo __ERROR_FORMAT
 		SEARCH_RECURSIVE_COEFFICIENT_ARREY[$INC]=`__parsing_json_data "$REPOSITORY_OPTIONS" .recursive.coefficient | grep -vx __ERROR_FORMAT_JSON__`
 		SEARCH_NAME_IGNORE_ARREY[$INC]=`__parsing_json_data "$REPOSITORY_OPTIONS" .name_ignore`
 		SEARCH_RM_NON_EMPTY_DIRS_ARREY[$INC]=`__parsing_json_data "$REPOSITORY_OPTIONS" .rm_non_empty_dirs`
-		SEARCH_AGE_MORE_ARREY[$INC]=`__parsing_json_data "$REPOSITORY_OPTIONS" .age | grep -Ex '>[0-9]{1,256}' | sed 's/^>//' | tail -n 1`
-		SEARCH_AGE_LESS_ARREY[$INC]=`__parsing_json_data "$REPOSITORY_OPTIONS" .age | grep -Ex '<[0-9]{1,256}' | sed 's/^<//' | tail -n 1`
-		SEARCH_AGE_EQUAL_ARREY[$INC]=`__parsing_json_data "$REPOSITORY_OPTIONS" .age | grep -Ex '=[0-9]{1,256}' | sed 's/^=//' | tail -n 1`
-		SEARCH_SIZE_MORE_ARREY[$INC]=`__parsing_json_data "$REPOSITORY_OPTIONS" .size  | grep -Ex '>[0-9]{1,256}(gb|Gb|GB|mb|Mb|MB|kb|Kb|KB|)' \
+		SEARCH_AGE_MORE_ARREY[$INC]=`__parsing_json_data "$REPOSITORY_OPTIONS" .age | grep -Ex '>[0-9]{1,128}' | sed 's/^>//' | tail -n 1`
+		SEARCH_AGE_LESS_ARREY[$INC]=`__parsing_json_data "$REPOSITORY_OPTIONS" .age | grep -Ex '<[0-9]{1,128}' | sed 's/^<//' | tail -n 1`
+		SEARCH_AGE_EQUAL_ARREY[$INC]=`__parsing_json_data "$REPOSITORY_OPTIONS" .age | grep -Ex '=[0-9]{1,128}' | sed 's/^=//' | tail -n 1`
+		SEARCH_SIZE_MORE_ARREY[$INC]=`__parsing_json_data "$REPOSITORY_OPTIONS" .size  | grep -Ex '>[0-9]{1,128}(gb|Gb|GB|mb|Mb|MB|kb|Kb|KB|)' \
 		| sed -E 's/^>//; s/(kb|Kb|KB)/000/g; s/(mb|Mb|MB)/000000/g; s/(gb|Gb|GB)/000000000/g' | tail -n 1`
-		SEARCH_SIZE_LESS_ARREY[$INC]=`__parsing_json_data "$REPOSITORY_OPTIONS" .size  | grep -Ex '<[0-9]{1,256}(gb|Gb|GB|mb|Mb|MB|kb|Kb|KB|)' \
+		SEARCH_SIZE_LESS_ARREY[$INC]=`__parsing_json_data "$REPOSITORY_OPTIONS" .size  | grep -Ex '<[0-9]{1,128}(gb|Gb|GB|mb|Mb|MB|kb|Kb|KB|)' \
 		| sed -E 's/^<//; s/(kb|Kb|KB)/000/g; s/(mb|Mb|MB)/000000/g; s/(gb|Gb|GB)/000000000/g' | tail -n 1`
-		SEARCH_SIZE_EQUAL_ARREY[$INC]=`__parsing_json_data "$REPOSITORY_OPTIONS" .size | grep -Ex '=[0-9]{1,256}(gb|Gb|GB|mb|Mb|MB|kb|Kb|KB|)' \
+		SEARCH_SIZE_EQUAL_ARREY[$INC]=`__parsing_json_data "$REPOSITORY_OPTIONS" .size | grep -Ex '=[0-9]{1,128}(gb|Gb|GB|mb|Mb|MB|kb|Kb|KB|)' \
 		| sed -E 's/^=//; s/(kb|Kb|KB)/000/g; s/(mb|Mb|MB)/000000/g; s/(gb|Gb|GB)/000000000/g' | tail -n 1`
 
 		for INT in REPOSITORY_ARREY SEARCH_NAME_ARREY SEARCH_RECURSIVE_ARREY SEARCH_NAME_IGNORE_ARREY SEARCH_RM_NON_EMPTY_DIRS_ARREY
@@ -232,7 +232,7 @@ __parsing_json_data () { echo "$1" | { jq $2 2> /dev/null || echo __ERROR_FORMAT
 								fi
 							done
 
-							if [ -z "$EXIST_ARTIFACT_children_url" ] && { [ -z "`echo ${SEARCH_RECURSIVE_COEFFICIENT_ARREY[$INCREM]} | grep -Ex '[0-9]{1,256}'`" ] || \
+							if [ -z "$EXIST_ARTIFACT_children_url" ] && { [ -z "`echo ${SEARCH_RECURSIVE_COEFFICIENT_ARREY[$INCREM]} | grep -Ex '[0-9]{1,128}'`" ] || \
 							(( "${SEARCH_RECURSIVE_COEFFICIENT_ARREY[$INCREM]}" >= "`echo $TEST_ARTIFACT_children_url | sed "s#${REPOSITORY_ARREY[$INCREM]}/##; s#/#\n#g" | wc -l`" )); }
 							then
 								__definition_of_the_first_empty_index
