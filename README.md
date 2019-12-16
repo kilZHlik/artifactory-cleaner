@@ -56,6 +56,7 @@ The config has the format YAML.
 A similar configuration file should be connected to the container as a volume in the following path: `/opt/artifactory-cleaner/artifactory-cleaner.yml`
 When manually starting a scan, Artifactory-cleaner allows you to override the config used.
 To be able to manually start searching and cleaning artifacts with a different configuration file, you also need to connect it to the container as an additional volume, or test the config created inside the container (not recommended if you are not familiar with Docker). Manually launching Artifactory-cleaner in emulation mode with an alternative config is a true way approach for selecting and testing the search config before entering the parameters from it into the default configuration file used in the container.
+
 *For more details, see 3. Manual start of artifact cleaning.*
 
 
@@ -67,6 +68,7 @@ To be able to manually start searching and cleaning artifacts with a different c
 * `timeout_rescan:` `<numbers>` - The length of the intervals in days between automatic search and removal of irrelevant artifacts. (optional config parameter). Format: integers.
 If the` timeout_rescan` parameter is not defined in the configuration file, then when the container starts, Artifactory-cleaner will perform an initial scan of the repositories according to the config data, but will not be scannig repeatedly until the value of the `timeout_rescan` parameter in the config is determined. If the value of the` EMULATION_MODE` variable is defined as `false` when the container starts, then the found artifacts will not be deleted in this case. If the` timeout_rescan` parameter is missing, the configuration file is re-read automatically with a frequency of 30 seconds - for the convenience of updating the config without restarting the container.
 When the value of the` timeout_rescan` parameter is set, the Artifactory-cleaner re-reads its value and the parameters from the `repositories` list before each scan of the repositories according to the specified timeout. Thus, when updating the search parameters in the config, there is no need to restart the container. The parameter` timeout_rescan` sets the number of days during which only one scan will be performed, but does not determine the time of its execution. The start time of the scan is always determined randomly. This behavior of the Artifactory-cleaner scheduler is intended for ease of configuration and to combat load spikes during possible scanning in organizations of one common Artifactory service from multiple containers.
+
 *The ability to set a specific start-up time for cleaning is described in Section 3, Manual Start of Artifact Cleaning*
 
 
